@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>PERANGKAT TERKUNCI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  margin:0;
+  background:black;
+  color:#ff0000;
+  font-family:monospace;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.box{
+  border:2px solid red;
+  padding:20px;
+  width:95%;
+  max-width:420px;
+  text-align:center;
+  animation: glitch 0.15s infinite;
+}
+
+@keyframes glitch{
+  0%{transform:translate(0,0);}
+  25%{transform:translate(2px,-2px);}
+  50%{transform:translate(-2px,2px);}
+  75%{transform:translate(2px,2px);}
+  100%{transform:translate(0,0);}
+}
+
+h2{
+  animation: blink 1s infinite;
+}
+
+@keyframes blink{
+  50%{opacity:0.3;}
+}
+
+input{
+  width:85%;
+  padding:10px;
+  margin-top:15px;
+  background:black;
+  border:1px solid red;
+  color:red;
+  text-align:center;
+  font-size:16px;
+}
+
+button{
+  margin-top:15px;
+  padding:10px 25px;
+  background:red;
+  color:black;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
+
+#msg{
+  margin-top:15px;
+  font-size:14px;
+}
+
+.footer{
+  margin-top:20px;
+  font-size:12px;
+  color:white;
+  opacity:0.7;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h2>⚠️ PERANGKAT ANDA TERKUNCI ⚠️</h2>
+  <p>
+    Semua data anda telah <b>DIAMANKAN</b>.<br>
+    Foto, video, kontak, dan file pribadi<br>
+    <b>DITAHAN</b>.
+  </p>
+  <p>
+    Masukkan PIN untuk membuka kembali<br>
+    data anda.
+  </p>
+
+  <input type="password" id="pin" placeholder="MASUKKAN PIN">
+  <br>
+  <button onclick="cek()">BUKA KUNCI</button>
+
+  <div id="msg"></div>
+  <div class="footer">BY RAFZZ</div>
+</div>
+
+<script>
+// ===== SUARA ALARM PALSU =====
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let oscillator;
+
+function alarm(){
+  oscillator = audioCtx.createOscillator();
+  oscillator.type = "square";
+  oscillator.frequency.setValueAtTime(700, audioCtx.currentTime);
+  oscillator.connect(audioCtx.destination);
+  oscillator.start();
+  setTimeout(()=>oscillator.stop(), 300);
+}
+
+setInterval(alarm, 800);
+
+// ===== GETAR PALSU =====
+if(navigator.vibrate){
+  setInterval(()=>{
+    navigator.vibrate([300,100,300]);
+  },1200);
+}
+
+// ===== CEK PIN =====
+function cek(){
+  const pin = document.getElementById("pin").value;
+  const msg = document.getElementById("msg");
+
+  if(pin === "RAFZZ"){
+    msg.innerHTML = "✅ PIN BENAR<br>DATA DIBUKA<br>(FAKE 😄)";
+    msg.style.color = "lime";
+  }else{
+    msg.innerHTML = "❌ PIN SALAH<br>AKSES DITOLAK!";
+    msg.style.color = "red";
+  }
+}
+</script>
+
+</body>
+</html>

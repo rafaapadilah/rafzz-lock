@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android Security Alert</title>
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;width:100%;height:100%;
+  background:#000;color:#fff;
+  font-family:system-ui,Roboto,Arial,sans-serif;
+  overflow:hidden;
+}
+.wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{
+  width:100%;max-width:420px;background:#0b0b0b;border-radius:16px;
+  border:1px solid rgba(255,255,255,.15);padding:18px;text-align:center
+}
+h1{margin:0 0 6px;color:#ff3b30;font-size:20px}
+p{margin:6px 0;font-size:14px}
+.timer{margin:8px 0;color:#ff3b30;font-weight:700;font-size:18px}
+.fake{margin-top:10px;font-size:11px;opacity:.5}
+
+.dots{display:flex;justify-content:center;gap:10px;margin:12px 0}
+.dot{width:12px;height:12px;border-radius:50%;border:1px solid #fff;opacity:.5}
+.dot.on{background:#fff;opacity:1}
+
+.keypad{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px
+}
+.key{
+  padding:14px 0;border-radius:10px;background:#151515;border:1px solid #333;
+  font-size:18px;user-select:none
+}
+.key:active{background:#222}
+.key.del{grid-column:span 3;background:#1b1b1b}
+
+.flash{position:fixed;inset:0;pointer-events:none;background:rgba(255,0,0,.6);
+  opacity:0;animation:flash 1.2s infinite}
+@keyframes flash{0%,70%,100%{opacity:0}80%,90%{opacity:1}}
+.shake{animation:shake .35s}
+@keyframes shake{
+  0%{transform:translateX(0)}25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}75%{transform:translateX(-6px)}
+  100%{transform:translateX(0)}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card" id="card">
+    <h1>⚠ Perangkat Terkunci</h1>
+    <p>Masukkan <b>KODE DIGIT</b> untuk verifikasi</p>
+    <p><b>Rp 200.000</b> • Kontak: <b>08xxxxxxxxxx</b></p>
+    <div class="timer">Sisa waktu: <span id="t">05:00</span></div>
+
+    <div class="dots" id="dots">
+      <div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
+    </div>
+
+    <div class="keypad">
+      <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+      <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+      <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+      <div class="key">0</div>
+      <div class="key del">HAPUS</div>
+    </div>
+
+    <div class="fake">FAKE / SIMULASI UI SAJA</div>
+  </div>
+</div>
+
+<div class="flash"></div>
+
+<audio id="snd" loop>
+  <source src="https://www.soundjay.com/horror/sounds/horror-ambience-2.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// FULLSCREEN + SOUND
+function fs(){document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();}
+document.body.addEventListener("click",()=>{
+  fs(); document.getElementById("snd").play().catch(()=>{});
+},{once:true});
+
+// BLOK BACK
+history.pushState(null,null,location.href);
+window.onpopstate=()=>history.pushState(null,null,location.href);
+
+// COUNTDOWN 5 menit
+let s=300;
+setInterval(()=>{
+  if(s>0){
+    s--;
+    const m=String(Math.floor(s/60)).padStart(2,'0');
+    const d=String(s%60).padStart(2,'0');
+    document.getElementById('t').textContent=`${m}:${d}`;
+  }
+},1000);
+
+// GETAR PALSU
+if(navigator.vibrate){
+  setInterval(()=>navigator.vibrate([200,100,200]),2500);
+}
+
+// KEYPAD (SELALU SALAH)
+let code=[];
+const dots=[...document.querySelectorAll('.dot')];
+const card=document.getElementById('card');
+document.querySelectorAll('.key').forEach(k=>{
+  k.onclick=()=>{
+    if(k.classList.contains('del')){
+      code=[]; dots.forEach(d=>d.classList.remove('on')); return;
+    }
+    if(code.length<4){
+      code.push(k.textContent);
+      dots[code.length-1].classList.add('on');
+    }
+    if(code.length===4){
+      // selalu salah
+      if(navigator.vibrate) navigator.vibrate([300,100,300]);
+      card.classList.add('shake');
+      setTimeout(()=>card.classList.remove('shake'),400);
+      setTimeout(()=>{
+        code=[]; dots.forEach(d=>d.classList.remove('on'));
+      },500);
+    }
+  }
+});
+
+// BLOK MENU
+document.addEventListener("contextmenu",e=>e.preventDefault());
+</script>
+</body>
+  </html>

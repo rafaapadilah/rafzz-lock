@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Ravzz Lock</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      color: #ff2b2b;
+      font-family: Arial, Helvetica, sans-serif;
+      overflow: hidden;
+    }
+    .screen {
+      position: fixed; inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { font-size: 28px; letter-spacing: 2px; margin: 0 0 10px; }
+    .by { color:#aaa; font-size:12px; margin-bottom:20px; }
+    .msg { font-size: 16px; line-height: 1.4; margin-bottom: 20px; color:#ff6b6b;}
+    .pin {
+      display: flex; gap: 10px; justify-content: center; margin-bottom: 16px;
+    }
+    .pin input {
+      width: 40px; height: 48px;
+      background: #111; border: 1px solid #ff2b2b;
+      color: #ff2b2b; font-size: 22px; text-align: center;
+    }
+    button {
+      background:#ff2b2b; color:#000;
+      border:none; padding:12px 20px;
+      font-weight:700; cursor:pointer;
+    }
+    .hint { color:#777; font-size:12px; margin-top:10px;}
+    .exit {
+      position: fixed; bottom: 10px; right: 10px;
+      background:#333; color:#ccc; padding:6px 10px; font-size:12px;
+    }
+    /* efek horor ringan */
+    .glitch {
+      animation: glitch 0.15s infinite alternate;
+      text-shadow: 2px 0 #ff0000, -2px 0 #00ffff;
+    }
+    @keyframes glitch { from{transform:translate(0)} to{transform:translate(1px,-1px)} }
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <h1 class="glitch">DEVICE LOCKED</h1>
+    <div class="by">BY RAFZZ</div>
+    <div class="msg">
+      Sistem mendeteksi aktivitas tidak biasa.<br/>
+      Masukkan PIN untuk melanjutkan.
+    </div>
+
+    <div class="pin">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+    </div>
+
+    <button onclick="checkPin()">UNLOCK</button>
+    <div class="hint">Demo/prank • PIN: <b>1234</b></div>
+  </div>
+
+  <button class="exit" onclick="exitDemo()">Keluar Demo</button>
+
+  <audio id="buzz" loop>
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
+  </audio>
+
+  <script>
+    // auto focus pindah
+    const inputs = document.querySelectorAll('.pin input');
+    inputs.forEach((inp, i) => {
+      inp.addEventListener('input', () => {
+        if (inp.value && inputs[i+1]) inputs[i+1].focus();
+      });
+    });
+
+    // suara + getar palsu
+    const audio = document.getElementById('buzz');
+    document.addEventListener('click', () => {
+      audio.volume = 0.2;
+      audio.play().catch(()=>{});
+      if (navigator.vibrate) navigator.vibrate([200,100,200]);
+    }, { once:true });
+
+    function checkPin(){
+      const pin = Array.from(inputs).map(i=>i.value).join('');
+      if(pin === '1234'){
+        alert('UNLOCKED (DEMO)');
+        exitDemo();
+      } else {
+        document.body.classList.toggle('glitch');
+        if (navigator.vibrate) navigator.vibrate([300,150,300]);
+        alert('PIN SALAH');
+      }
+    }
+
+    function exitDemo(){
+      document.body.innerHTML =
+        '<div class="screen"><h1>DEMO SELESAI</h1><p>Ini hanya tampilan demo/prank.</p></div>';
+    }
+
+    // cegah back (sebatas browser)
+    history.pushState(null, '', location.href);
+    window.onpopstate = () => history.pushState(null, '', location.href);
+  </script>
+</body>
+  </html>
